@@ -2,8 +2,8 @@ import "../styles/globals.css";
 
 import { Inter } from "next/font/google";
 
-import { assistantId } from "@/config/assistant-config";
 import Warnings from "@/components/warnings";
+import { assistantId } from "@/config/assistant-config";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
