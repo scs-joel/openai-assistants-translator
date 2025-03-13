@@ -1,6 +1,8 @@
 import "../styles/globals.css";
 
+import { Analytics } from "@vercel/analytics/react";
 import { Inter } from "next/font/google";
+import Image from "next/image";
 
 import Warnings from "@/components/warnings";
 import { assistantId } from "@/config/assistant-config";
@@ -19,7 +21,14 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         {assistantId ? children : <Warnings />}
-        <img className="logo" src="/openai.svg" alt="OpenAI Logo" />
+        <Image
+          className="size-8 absolute top-0 right-0 m-4"
+          src="/openai.svg"
+          alt="OpenAI Logo"
+          width={32}
+          height={32}
+        />
+        <Analytics />
       </body>
     </html>
   );

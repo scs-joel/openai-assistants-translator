@@ -4,7 +4,7 @@ import { openai } from "@/config/openai";
 
 // download file by file ID
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ fileId: string }> },
 ) {
   const { fileId } = await params;

@@ -7,7 +7,7 @@ import { openai } from "@/config/openai";
 
 import { translatorConfig } from "../config/translator";
 
-export async function createTranslationAssistant() {
+export async function createTranslationAssistant(openaiApiKey: string) {
   // Define the assistant's instructions
   const instructions = `
   You are a specialized translator for Japanese game dialog to English. Your task is to:
@@ -19,10 +19,12 @@ export async function createTranslationAssistant() {
   5. Remember you are being given a script
   6. Make sure to translate the entire document
   7. Output only the translations with no explanations.
+
   When translating, consider the character's personality and background when available.
   For each translated line, maintain the same format as the input with [Line N] identifiers.
   `;
 
+  openai.apiKey = openaiApiKey;
   // Create the assistant
   const assistant = await openai.beta.assistants.create({
     name: "Japanese Game Dialog Translator",
@@ -39,8 +41,10 @@ export async function createTranslationAssistant() {
 export async function translateGameDialog(
   fileContent: string,
   fileName: string,
+  openaiApiKey: string,
   assistantId: string = translatorConfig.assistant_id,
 ) {
+  openai.apiKey = openaiApiKey;
   // Parse the CSV content
   const records: Record<string, string>[] = [];
 
@@ -165,7 +169,7 @@ export async function translateGameDialog(
   // Get or create an assistant
   let assistant;
   if (!assistantId) {
-    assistant = await createTranslationAssistant();
+    assistant = await createTranslationAssistant(openaiApiKey);
     assistantId = assistant.id;
   }
 

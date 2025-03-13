@@ -1,11 +1,14 @@
 "use client";
 import React, { useState } from "react";
 
+import { openai } from "@/config/openai";
 import { useTranslation } from "@/translation/hooks/useTranslation";
 
 const FileUpload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [assistantId, setAssistantId] = useState<string>("");
+  const [openaiApiKey, setOpenAIApiKey] = useState<string>("");
+
   const {
     translateFile,
     downloadTranslatedFile,
@@ -25,14 +28,17 @@ const FileUpload: React.FC = () => {
     setAssistantId(e.target.value);
   };
 
+  const handleOpenAIApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setOpenAIApiKey(e.target.value);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!file) {
+    if (!file || openaiApiKey.length === 0) {
       return;
     }
-
-    await translateFile(file, assistantId || undefined);
+    await translateFile(file, openaiApiKey, assistantId || undefined);
   };
 
   return (
@@ -58,6 +64,27 @@ const FileUpload: React.FC = () => {
             &apos;Japanese&apos;
             <br /> 2. Destinated column for translated text should be called
             &apos;English&apos;
+          </p>
+        </div>
+
+        <div>
+          <label
+            htmlFor="openaiApiKey"
+            className="mb-1 block text-sm font-medium"
+          >
+            OpenAI API Key
+          </label>
+          <input
+            type="text"
+            id="openaiApiKey"
+            value={openaiApiKey}
+            onChange={handleOpenAIApiKeyChange}
+            className="block w-full rounded border border-gray-300 p-2 text-sm"
+            placeholder="OpenAI API Key"
+            required
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Your OpenAI Api Key. Necessary to make use of this application.
           </p>
         </div>
 
