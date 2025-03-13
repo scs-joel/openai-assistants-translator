@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
   // Check if the OpenAI API key is configured
   if (!process.env.OPENAI_API_KEY) {
     return NextResponse.json(
-      { error: "OpenAI API key is not configured" },
-      { status: 500 }
+      { error: 'OpenAI API key is not configured' },
+      { status: 500 },
     );
   }
 
@@ -14,11 +14,11 @@ export async function middleware(request: NextRequest) {
   // For example, checking headers, implementing a token bucket algorithm, etc.
 
   // Check file size
-  const contentLength = request.headers.get("content-length");
+  const contentLength = request.headers.get('content-length');
   if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) {
     return NextResponse.json(
-      { error: "File size exceeds 10MB limit" },
-      { status: 413 }
+      { error: 'File size exceeds 10MB limit' },
+      { status: 413 },
     );
   }
 
@@ -27,5 +27,5 @@ export async function middleware(request: NextRequest) {
 
 // Configure the middleware to run only for the translation API route
 export const config = {
-  matcher: "/api/translate",
+  matcher: '/api/translate',
 };

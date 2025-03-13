@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "yoavbls.pretty-ts-errors",
+    "mikestead.dotenv",
+    "eamodio.gitlens",
+    "formulahendry.auto-close-tag",
+    "formulahendry.auto-rename-tag",
+    "bradlc.vscode-tailwindcss",
+    "wesbos.theme-cobalt2"
+  ]
+}

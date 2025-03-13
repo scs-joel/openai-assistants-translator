@@ -1,17 +1,19 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import styles from "./page.module.css";
-import Chat from "@/components/chat";
-import WeatherWidget from "@/components/weather-widget";
-import { getWeather } from "@/utils/weather";
-import FileViewer from "@/components/file-viewer";
+import React, { useState } from 'react';
+
+import Chat from '@/components/chat';
+import FileViewer from '@/components/file-viewer';
+import WeatherWidget from '@/components/weather-widget';
+import { getWeather } from '@/utils';
+
+import styles from './page.module.css';
 
 const FunctionCalling = () => {
   const [weatherData, setWeatherData] = useState({});
 
   const functionCallHandler = async (call) => {
-    if (call?.function?.name !== "get_weather") return;
+    if (call?.function?.name !== 'get_weather') return;
     const args = JSON.parse(call.function.arguments);
     const data = getWeather(args.location);
     setWeatherData(data);

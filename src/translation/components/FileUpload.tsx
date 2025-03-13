@@ -1,10 +1,11 @@
-"use client";
-import React, { useState } from "react";
-import { useTranslation } from "@/translation/hooks/useTranslation";
+'use client';
+import React, { useState } from 'react';
+
+import { useTranslation } from '@/translation/hooks/useTranslation';
 
 const FileUpload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [assistantId, setAssistantId] = useState<string>("");
+  const [assistantId, setAssistantId] = useState<string>('');
   const {
     translateFile,
     downloadTranslatedFile,
@@ -35,25 +36,25 @@ const FileUpload: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">
+    <div className='mx-auto max-w-4xl p-6'>
+      <h1 className='mb-6 text-2xl font-bold'>
         Japanese Game Dialog Translator
       </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className='space-y-4'>
         <div>
-          <label htmlFor="file" className="block text-sm font-medium mb-1">
+          <label htmlFor='file' className='mb-1 block text-sm font-medium'>
             CSV File
           </label>
           <input
-            type="file"
-            id="file"
-            accept=".csv"
+            type='file'
+            id='file'
+            accept='.csv'
             onChange={handleFileChange}
-            className="block w-full text-sm border border-gray-300 rounded p-2"
+            className='block w-full rounded border border-gray-300 p-2 text-sm'
             required
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className='mt-1 text-xs text-gray-500'>
             CSV file with Japanese dialog text. Should include a column with
             Japanese text.
           </p>
@@ -61,49 +62,49 @@ const FileUpload: React.FC = () => {
 
         <div>
           <label
-            htmlFor="assistantId"
-            className="block text-sm font-medium mb-1"
+            htmlFor='assistantId'
+            className='mb-1 block text-sm font-medium'
           >
             Assistant ID (Optional)
           </label>
           <input
-            type="text"
-            id="assistantId"
+            type='text'
+            id='assistantId'
             value={assistantId}
             onChange={handleAssistantIdChange}
-            className="block w-full text-sm border border-gray-300 rounded p-2"
-            placeholder="OpenAI Assistant ID (optional)"
+            className='block w-full rounded border border-gray-300 p-2 text-sm'
+            placeholder='OpenAI Assistant ID (optional)'
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className='mt-1 text-xs text-gray-500'>
             If blank, a new assistant will be created or the default one will be
             used
           </p>
         </div>
 
         <button
-          type="submit"
+          type='submit'
           disabled={isLoading || !file}
-          className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-blue-300"
+          className='rounded bg-blue-600 px-4 py-2 text-white disabled:bg-blue-300'
         >
-          {isLoading ? "Translating..." : "Translate Dialog"}
+          {isLoading ? 'Translating...' : 'Translate Dialog'}
         </button>
       </form>
 
       {error && (
-        <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className='mt-4 rounded border border-red-400 bg-red-100 p-4 text-red-700'>
           {error}
         </div>
       )}
 
       {translationStats && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-2">Translation Results</h2>
-          <div className="bg-gray-50 p-4 rounded">
+        <div className='mt-6'>
+          <h2 className='mb-2 text-xl font-semibold'>Translation Results</h2>
+          <div className='rounded bg-gray-50 p-4'>
             <p>
               <strong>Total Rows:</strong> {translationStats.total_rows}
             </p>
             <p>
-              <strong>Translated Rows:</strong>{" "}
+              <strong>Translated Rows:</strong>{' '}
               {translationStats.translated_rows}
             </p>
             <p>
@@ -114,7 +115,7 @@ const FileUpload: React.FC = () => {
           {translatedCsvData && (
             <button
               onClick={downloadTranslatedFile}
-              className="mt-4 px-4 py-2 bg-green-600 text-white rounded"
+              className='mt-4 rounded bg-green-600 px-4 py-2 text-white'
             >
               Download Translated CSV
             </button>

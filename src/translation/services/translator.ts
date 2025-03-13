@@ -1,9 +1,10 @@
-import { OpenAI } from "openai";
-import fs from "fs";
-import path from "path";
-import { parse } from "csv-parse";
-import { stringify } from "csv-stringify/sync";
-import { translatorConfig } from "../config/translator";
+import { parse } from 'csv-parse';
+import { stringify } from 'csv-stringify/sync';
+import fs from 'fs';
+import { OpenAI } from 'openai';
+import path from 'path';
+
+import { translatorConfig } from '../config/translator';
 
 // Initialize OpenAI client
 const client = new OpenAI({
@@ -27,10 +28,10 @@ export async function createTranslationAssistant() {
 
   // Create the assistant
   const assistant = await client.beta.assistants.create({
-    name: "Japanese Game Dialog Translator",
+    name: 'Japanese Game Dialog Translator',
     instructions: instructions,
-    model: "gpt-4o",
-    tools: [{ type: "file_search" }],
+    model: 'gpt-4o',
+    tools: [{ type: 'file_search' }],
     temperature: 1,
   });
 
@@ -41,7 +42,7 @@ export async function createTranslationAssistant() {
 export async function translateGameDialog(
   fileContent: string,
   fileName: string,
-  assistantId: string = translatorConfig.assistant_id
+  assistantId: string = translatorConfig.assistant_id,
 ) {
   // Parse the CSV content
   const records: Record<string, string>[] = [];
@@ -52,16 +53,16 @@ export async function translateGameDialog(
       columns: true,
       skip_empty_lines: true,
     })
-      .on("readable", function () {
+      .on('readable', function () {
         let record: Record<string, string>;
         while ((record = this.read()) !== null) {
           records.push(record);
         }
       })
-      .on("error", (err) => {
+      .on('error', (err) => {
         reject(err);
       })
-      .on("end", () => {
+      .on('end', () => {
         resolve();
       });
   });
@@ -80,9 +81,9 @@ export async function translateGameDialog(
 
   for (const col of columns) {
     if (
-      col.toLowerCase().includes("character") ||
-      col.toLowerCase().includes("name") ||
-      col.includes("キャラクター名")
+      col.toLowerCase().includes('character') ||
+      col.toLowerCase().includes('name') ||
+      col.includes('キャラクター名')
     ) {
       charCol = col;
       break;
@@ -94,9 +95,9 @@ export async function translateGameDialog(
   if (!columns.includes(sourceCol)) {
     for (const col of columns) {
       if (
-        col.toLowerCase().includes("japanese") ||
-        col.toLowerCase().includes("source") ||
-        col.toLowerCase().includes("original")
+        col.toLowerCase().includes('japanese') ||
+        col.toLowerCase().includes('source') ||
+        col.toLowerCase().includes('original')
       ) {
         sourceCol = col;
         break;
@@ -106,13 +107,13 @@ export async function translateGameDialog(
   }
 
   // Create a text file from the CSV content
-  let textContent = "# JAPANESE GAME DIALOG\n\n";
+  let textContent = '# JAPANESE GAME DIALOG\n\n';
 
   // Write dialog entries to the text content
   records.forEach((row, i) => {
     if (!row[sourceCol]) return;
 
-    const charName = charCol && row[charCol] ? row[charCol] : "";
+    const charName = charCol && row[charCol] ? row[charCol] : '';
     const text = row[sourceCol];
 
     if (charName) {
@@ -123,15 +124,15 @@ export async function translateGameDialog(
   });
 
   // Create a temporary file
-  const tempFilePath = path.join("/tmp", `${Date.now()}-${fileName}.txt`);
-  fs.writeFileSync(tempFilePath, textContent, "utf8");
+  const tempFilePath = path.join('/tmp', `${Date.now()}-${fileName}.txt`);
+  fs.writeFileSync(tempFilePath, textContent, 'utf8');
   console.log(`Created temporary text file: ${tempFilePath}`);
 
   // Upload the text file to OpenAI
   const fileStream = fs.createReadStream(tempFilePath);
   const file = await client.files.create({
     file: fileStream,
-    purpose: "assistants",
+    purpose: 'assistants',
   });
   console.log(`Uploaded file with ID: ${file.id}`);
 
@@ -140,7 +141,7 @@ export async function translateGameDialog(
 
   // Create a vector store for our file
   const vectorStore = await client.vectorStores.create({
-    name: "Japanese Game Dialog",
+    name: 'Japanese Game Dialog',
     file_ids: [file.id],
   });
   console.log(`Created vector store with ID: ${vectorStore.id}`);
@@ -154,7 +155,7 @@ export async function translateGameDialog(
       vs.file_counts.total
     ) {
       console.log(
-        `Processing files... ${vs.file_counts.completed}/${vs.file_counts.total} completed`
+        `Processing files... ${vs.file_counts.completed}/${vs.file_counts.total} completed`,
       );
       await new Promise((resolve) => setTimeout(resolve, 5000));
     }
@@ -162,7 +163,7 @@ export async function translateGameDialog(
     vs.file_counts.completed + vs.file_counts.failed <
     vs.file_counts.total
   );
-  console.log("All files processed");
+  console.log('All files processed');
 
   // Get or create an assistant
   let assistant;
@@ -183,25 +184,25 @@ export async function translateGameDialog(
 
   // Create message in the thread
   await client.beta.threads.messages.create(thread.id, {
-    role: "user",
+    role: 'user',
     content: first_message,
   });
 
   // Run the assistant on the thread
-  let run = await client.beta.threads.runs.create(thread.id, {
+  const run = await client.beta.threads.runs.create(thread.id, {
     assistant_id: assistantId,
   });
 
-  console.log("Translation in progress...");
+  console.log('Translation in progress...');
 
   // Poll for completion
   let runStatus;
   do {
     runStatus = await client.beta.threads.runs.retrieve(thread.id, run.id);
 
-    if (runStatus.status === "completed") {
-      console.log("Translation completed!");
-    } else if (["failed", "cancelled", "expired"].includes(runStatus.status)) {
+    if (runStatus.status === 'completed') {
+      console.log('Translation completed!');
+    } else if (['failed', 'cancelled', 'expired'].includes(runStatus.status)) {
       console.log(`Translation failed with status: ${runStatus.status}`);
       throw new Error(`Translation failed with status: ${runStatus.status}`);
     } else {
@@ -209,42 +210,42 @@ export async function translateGameDialog(
       await new Promise((resolve) => setTimeout(resolve, 5000));
     }
   } while (
-    !["completed", "failed", "cancelled", "expired"].includes(runStatus.status)
+    !['completed', 'failed', 'cancelled', 'expired'].includes(runStatus.status)
   );
 
   // Retrieve the messages
   const messages = await client.beta.threads.messages.list(thread.id, {
-    order: "asc",
+    order: 'asc',
   });
 
   // Get the response message
   const assistantMessages = messages.data.filter(
-    (msg) => msg.role === "assistant"
+    (msg) => msg.role === 'assistant',
   );
   if (assistantMessages.length === 0) {
-    console.log("No response from assistant");
-    return { success: false, error: "No response from assistant" };
+    console.log('No response from assistant');
+    return { success: false, error: 'No response from assistant' };
   }
 
   const latestMessage = assistantMessages[0];
-  let translatedContent = "";
+  let translatedContent = '';
 
   // Extract text content from the message
   for (const contentItem of latestMessage.content) {
-    if (contentItem.type === "text") {
+    if (contentItem.type === 'text') {
       translatedContent += contentItem.text.value;
     }
   }
 
   // Parse the initial translations
   const initialTranslations: Record<number, string> = {};
-  const currentLines = translatedContent.split("[Line ");
+  const currentLines = translatedContent.split('[Line ');
 
   for (const line of currentLines) {
     if (!line.trim()) continue;
 
     // Extract line number and translation
-    const parts = line.split("]", 2);
+    const parts = line.split(']', 2);
     if (parts.length < 2) continue;
 
     try {
@@ -252,7 +253,7 @@ export async function translateGameDialog(
       let translation = parts[1].trim();
 
       // Clean up any leading colons or spaces
-      if (translation.startsWith(":")) {
+      if (translation.startsWith(':')) {
         translation = translation.substring(1).trim();
       }
 
@@ -268,14 +269,14 @@ export async function translateGameDialog(
     if (initialTranslations[idx]) {
       row[target_column] = initialTranslations[idx];
     } else {
-      row[target_column] = "";
+      row[target_column] = '';
     }
   });
 
   // Add a second message to the thread for refinement
-  console.log("Adding second message to refine translations...");
+  console.log('Adding second message to refine translations...');
   await client.beta.threads.messages.create(thread.id, {
-    role: "user",
+    role: 'user',
     content: second_message,
   });
 
@@ -284,20 +285,20 @@ export async function translateGameDialog(
     assistant_id: assistantId,
   });
 
-  console.log("Refinement in progress...");
+  console.log('Refinement in progress...');
 
   // Poll for completion of the second run
   let secondRunStatus;
   do {
     secondRunStatus = await client.beta.threads.runs.retrieve(
       thread.id,
-      secondRun.id
+      secondRun.id,
     );
 
-    if (secondRunStatus.status === "completed") {
-      console.log("Refinement completed!");
+    if (secondRunStatus.status === 'completed') {
+      console.log('Refinement completed!');
     } else if (
-      ["failed", "cancelled", "expired"].includes(secondRunStatus.status)
+      ['failed', 'cancelled', 'expired'].includes(secondRunStatus.status)
     ) {
       console.log(`Refinement failed with status: ${secondRunStatus.status}`);
       // We'll continue with the initial translations
@@ -307,25 +308,25 @@ export async function translateGameDialog(
       await new Promise((resolve) => setTimeout(resolve, 5000));
     }
   } while (
-    !["completed", "failed", "cancelled", "expired"].includes(
-      secondRunStatus.status
+    !['completed', 'failed', 'cancelled', 'expired'].includes(
+      secondRunStatus.status,
     )
   );
 
   // Retrieve all messages again to get the refined translation
   const updatedMessages = await client.beta.threads.messages.list(thread.id, {
-    order: "asc",
+    order: 'asc',
   });
 
   // Get the latest assistant message
   const refinedAssistantMessages = updatedMessages.data.filter(
-    (msg) => msg.role === "assistant"
+    (msg) => msg.role === 'assistant',
   );
-  let refinedContent = "";
+  let refinedContent = '';
 
   if (refinedAssistantMessages.length < 2) {
     console.log(
-      "No refined response from assistant, using original translation"
+      'No refined response from assistant, using original translation',
     );
     refinedContent = translatedContent;
   } else {
@@ -334,22 +335,22 @@ export async function translateGameDialog(
 
     // Extract text content from the refined message
     for (const contentItem of refinedMessage.content) {
-      if (contentItem.type === "text") {
+      if (contentItem.type === 'text') {
         refinedContent += contentItem.text.value;
       }
     }
-    console.log("Retrieved refined translation");
+    console.log('Retrieved refined translation');
   }
 
   // Parse the refined translations
   const refinedTranslations: Record<number, string> = {};
-  const refinedLines = refinedContent.split("[Line ");
+  const refinedLines = refinedContent.split('[Line ');
 
   for (const line of refinedLines) {
     if (!line.trim()) continue;
 
     // Extract line number and translation
-    const parts = line.split("]", 2);
+    const parts = line.split(']', 2);
     if (parts.length < 2) continue;
 
     try {
@@ -357,7 +358,7 @@ export async function translateGameDialog(
       let translation = parts[1].trim();
 
       // Clean up any leading colons or spaces
-      if (translation.startsWith(":")) {
+      if (translation.startsWith(':')) {
         translation = translation.substring(1).trim();
       }
 
@@ -373,7 +374,7 @@ export async function translateGameDialog(
     if (refinedTranslations[idx]) {
       row[refinement_column] = refinedTranslations[idx];
     } else {
-      row[refinement_column] = "";
+      row[refinement_column] = '';
     }
   });
 

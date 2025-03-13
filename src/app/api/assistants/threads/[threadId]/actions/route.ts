@@ -1,4 +1,4 @@
-import { openai } from "@/openai";
+import { openai } from '@/openai';
 
 // Send a new message to a thread
 export async function POST(request, { params: { threadId } }) {
@@ -8,7 +8,7 @@ export async function POST(request, { params: { threadId } }) {
     threadId,
     runId,
     // { tool_outputs: [{ output: result, tool_call_id: toolCallId }] },
-    { tool_outputs: toolCallOutputs }
+    { tool_outputs: toolCallOutputs },
   );
 
   return new Response(stream.toReadableStream());
