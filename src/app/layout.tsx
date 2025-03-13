@@ -20,7 +20,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        {assistantId ? children : <Warnings />}
+        {children}
+        {/* {assistantId ? children : <Warnings />} */}
         <Image
           className="size-8 absolute top-0 right-0 m-4"
           src="/openai.svg"
