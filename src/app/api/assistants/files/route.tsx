@@ -1,16 +1,16 @@
-import { assistantId } from '@/assistant-config';
-import { openai } from '@/openai';
+import { assistantId } from "@/config/assistant-config";
+import { openai } from "@/config/openai";
 
 // upload file to assistant's vector store
 export async function POST(request) {
   const formData = await request.formData(); // process file as FormData
-  const file = formData.get('file'); // retrieve the single file from FormData
+  const file = formData.get("file"); // retrieve the single file from FormData
   const vectorStoreId = await getOrCreateVectorStore(); // get or create vector store
 
   // upload using the file stream
   const openaiFile = await openai.files.create({
     file: file,
-    purpose: 'assistants',
+    purpose: "assistants",
   });
   // add file to vector store
   await openai.vectorStores.files.create(vectorStoreId, {
@@ -62,7 +62,7 @@ const getOrCreateVectorStore = async () => {
   }
   // otherwise, create a new vector store and attatch it to the assistant
   const vectorStore = await openai.vectorStores.create({
-    name: 'sample-assistant-vector-store',
+    name: "sample-assistant-vector-store",
   });
   await openai.beta.assistants.update(assistantId, {
     tool_resources: {

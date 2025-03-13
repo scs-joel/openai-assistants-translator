@@ -1,4 +1,4 @@
-import { openai } from '@/openai';
+import { openai } from "@/config/openai";
 
 // download file by file ID
 export async function GET(_request, { params: { fileId } }) {
@@ -8,7 +8,7 @@ export async function GET(_request, { params: { fileId } }) {
   ]);
   return new Response(fileContent.body, {
     headers: {
-      'Content-Disposition': `attachment; filename="${file.filename}"`,
+      "Content-Disposition": `attachment; filename="${file.filename}"`,
     },
   });
 }

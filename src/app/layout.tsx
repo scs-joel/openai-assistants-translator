@@ -1,25 +1,25 @@
-import '../styles/globals.css';
+import "../styles/globals.css";
 
-import { Inter } from 'next/font/google';
+import { Inter } from "next/font/google";
 
-import { assistantId } from '@/assistant-config';
-import Warnings from '@/components/warnings';
-const inter = Inter({ subsets: ['latin'] });
+import { assistantId } from "@/config/assistant-config";
+import Warnings from "@/components/warnings";
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: 'Assistants API Quickstart',
-  description: 'A quickstart template using the Assistants API with OpenAI',
+  title: "Assistants API Quickstart",
+  description: "A quickstart template using the Assistants API with OpenAI",
   icons: {
-    icon: '/openai.svg',
+    icon: "/openai.svg",
   },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang='en'>
+    <html lang="en">
       <body className={inter.className}>
         {assistantId ? children : <Warnings />}
-        <img className='logo' src='/openai.svg' alt='OpenAI Logo' />
+        <img className="logo" src="/openai.svg" alt="OpenAI Logo" />
       </body>
     </html>
   );

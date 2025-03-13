@@ -1,14 +1,14 @@
-import { assistantId } from '@/assistant-config';
-import { openai } from '@/openai';
+import { assistantId } from "@/config/assistant-config";
+import { openai } from "@/config/openai";
 
-export const runtime = 'nodejs';
+export const runtime = "nodejs";
 
 // Send a new message to a thread
 export async function POST(request, { params: { threadId } }) {
   const { content } = await request.json();
 
   await openai.beta.threads.messages.create(threadId, {
-    role: 'user',
+    role: "user",
     content: content,
   });
 
