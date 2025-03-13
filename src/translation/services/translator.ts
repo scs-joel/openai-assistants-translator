@@ -31,7 +31,7 @@ export async function createTranslationAssistant(openaiApiKey: string) {
     instructions: instructions,
     model: "gpt-4o",
     tools: [{ type: "file_search" }],
-    temperature: 1,
+    temperature: 0.7,
   });
 
   console.log(`Created assistant with ID: ${assistant.id}`);
