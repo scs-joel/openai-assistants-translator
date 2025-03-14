@@ -13,11 +13,11 @@ export async function POST(request) {
       previousResponseId,
       totalRows,
       currentIndex,
-      openaiApiKey,
+      apikey,
     } = await request.json();
 
     // Initialize the OpenAI client
-    openai.apiKey = openaiApiKey;
+    openai.apiKey = apikey;
     // const openai = new OpenAI({
     //   apiKey: openaiApiKey,
     // });
