@@ -7,8 +7,8 @@ import Image from "next/image";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Assistants API Quickstart",
-  description: "A quickstart template using the Assistants API with OpenAI",
+  title: "OpenAI API Cookbook",
+  description: "A way to test OpenAI API's",
   icons: {
     icon: "/openai.svg",
   },

@@ -12,11 +12,12 @@ export async function POST(request) {
       previousResponseId,
       totalRows,
       currentIndex,
+      openaiApiKey,
     } = await request.json();
 
     // Initialize the OpenAI client
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: openaiApiKey,
     });
 
     // Parse the CSV data chunk
@@ -65,6 +66,7 @@ export async function POST(request) {
       store: true,
       temperature: 0.7,
     });
+    console.log("received translation");
 
     // Parse the response to get the translated data
     let translatedData;

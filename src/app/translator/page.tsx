@@ -4,6 +4,8 @@ import Papa from "papaparse";
 import React, { useRef, useState } from "react";
 
 export default function Translator() {
+  const [openaiApiKey, setOpenAIApiKey] = useState<string>("");
+
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("");
   const [csvData, setCsvData] = useState([]);
@@ -17,6 +19,10 @@ export default function Translator() {
   const [error, setError] = useState(null);
 
   const fileInputRef = useRef(null);
+
+  const handleOpenAIApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setOpenAIApiKey(e.target.value);
+  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -58,7 +64,7 @@ export default function Translator() {
 
     try {
       // Process in chunks to handle API limits
-      const CHUNK_SIZE = 20; // Adjust based on token limits
+      const CHUNK_SIZE = 10; // Adjust based on token limits
 
       for (let i = startIndex; i < csvData.length; i += CHUNK_SIZE) {
         const chunk = csvData.slice(i, i + CHUNK_SIZE);
@@ -79,6 +85,7 @@ export default function Translator() {
             previousResponseId: lastResponseId,
             totalRows: csvData.length,
             currentIndex: i,
+            apikey: openaiApiKey,
           }),
         });
 
@@ -133,6 +140,27 @@ export default function Translator() {
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm">
         <h1 className="text-4xl font-bold mb-8 text-center">CSV Translator</h1>
+
+        <div className="mb-4">
+          <label
+            htmlFor="openaiApiKey"
+            className="mb-1 block text-sm font-medium"
+          >
+            OpenAI API Key
+          </label>
+          <input
+            type="text"
+            id="openaiApiKey"
+            value={openaiApiKey}
+            onChange={handleOpenAIApiKeyChange}
+            className="block w-full rounded border border-gray-300 p-2 text-sm"
+            placeholder="OpenAI API Key"
+            required
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Your OpenAI Api Key. Necessary to make use of this application.
+          </p>
+        </div>
 
         <div className="mb-8">
           <div className="flex items-center justify-center mb-4">
