@@ -1,7 +1,8 @@
 // File: app/api/translate/route.js
-import OpenAI from "openai";
+//import OpenAI from "openai";
 
 export const maxDuration = 60; // Set to the maximum allowed by your Vercel plan
+import { openai } from "@/config/openai";
 
 export async function POST(request) {
   try {
@@ -16,9 +17,10 @@ export async function POST(request) {
     } = await request.json();
 
     // Initialize the OpenAI client
-    const openai = new OpenAI({
-      apiKey: openaiApiKey,
-    });
+    openai.apiKey = openaiApiKey;
+    // const openai = new OpenAI({
+    //   apiKey: openaiApiKey,
+    // });
 
     // Parse the CSV data chunk
     const csvChunk = JSON.parse(data);
