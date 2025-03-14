@@ -9,7 +9,7 @@ export default function Translator() {
   const [csvData, setCsvData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [translatedData, setTranslatedData] = useState([]);
-  const [sourceLanguage, setSourceLanguage] = useState("auto");
+  const [sourceLanguage, setSourceLanguage] = useState("ja");
   const [targetLanguage, setTargetLanguage] = useState("en");
   const [isTranslating, setIsTranslating] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -159,8 +159,9 @@ export default function Translator() {
             <select
               value={sourceLanguage}
               onChange={(e) => setSourceLanguage(e.target.value)}
-              className="border p-2 rounded"
-              disabled={isTranslating}
+              className="border p-2 rounded bg-gray-200 text-gray-500/50 w-36"
+              //disabled={isTranslating}
+              disabled
             >
               <option value="auto">Auto-detect</option>
               <option value="en">English</option>
@@ -179,8 +180,9 @@ export default function Translator() {
             <select
               value={targetLanguage}
               onChange={(e) => setTargetLanguage(e.target.value)}
-              className="border p-2 rounded"
-              disabled={isTranslating}
+              className="border p-2 rounded bg-gray-200 text-gray-500/50 w-36"
+              //disabled={isTranslating}
+              disabled
             >
               <option value="en">English</option>
               <option value="es">Spanish</option>

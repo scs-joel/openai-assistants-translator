@@ -23,21 +23,46 @@ export async function POST(request) {
     const csvChunk = JSON.parse(data);
 
     // Build context and instructions for translation
-    const prompt = `You are a professional translator. Translate the following CSV data from ${sourceLanguage === "auto" ? "the detected language" : sourceLanguage} to ${targetLanguage}.
+    const prompt = `You are a specialized translator for Japanese game dialog to English. Your task is to:
 
-                    Only translate the text content, keeping all numbers, dates, and special characters as they are.
-                    Maintain the exact same structure and format.
-                    Respond ONLY with the translated JSON data, maintaining the exact same keys.
+                    1. Translate the following CSV data into natural, conversational English
+                    2. Preserve character voice, emotional tone, and cultural context
+                    3. Handle hesitations (...), emphasis, and strong emotions authentically
+                    4. Focus on how English speakers would naturally express these ideas
+                    5. Remember you are being given a script
+                    6. Output only the translations with no explanations.
+                    7. Only translate the text content, keeping all numbers, dates, and special characters as they are.
+                    8. Maintain the exact same structure and format.
+                    9. Respond ONLY with the translated JSON data, maintaining the exact same keys.
+
+                    When translating, consider the character's personality and background when available.
 
                     Here is the data to translate (rows ${currentIndex + 1} to ${currentIndex + csvChunk.length} out of ${totalRows} total rows):
                     ${JSON.stringify(csvChunk, null, 2)}`;
 
     // Create the API request
     const response = await openai.responses.create({
-      model: "gpt-4o", // You can use a different model as needed
+      model: "gpt-4o-mini", // You can use a different model as needed
       input: prompt,
       store: true,
       ...(previousResponseId && { previous_response_id: previousResponseId }),
+      temperature: 0.7,
+    });
+
+    const secondResponse = await openai.responses.create({
+      model: "gpt-4o-mini",
+      previous_response_id: response.id,
+      input: [
+        {
+          role: "user",
+          content: `Make the English translation sound natural while keeping the overall context in mind.
+                    1. Only translate the text content, keeping all numbers, dates, and special characters as they are.
+                    2. Maintain the exact same structure and format.
+                    3. Respond ONLY with the translated JSON data, maintaining the exact same keys.
+                    `,
+        },
+      ],
+      store: true,
       temperature: 0.7,
     });
 
@@ -45,7 +70,7 @@ export async function POST(request) {
     let translatedData;
     try {
       // The response should be a JSON string
-      const outputText = response.output_text.trim();
+      const outputText = secondResponse.output_text.trim();
 
       // Extract JSON from the response if it's wrapped in code blocks
       const jsonMatch = outputText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
