@@ -34,9 +34,8 @@ export async function POST(request) {
                     4. Focus on how English speakers would naturally express these ideas
                     5. Remember you are being given a script
                     6. Output only the translations with no explanations.
-                    7. Only translate the text content, keeping all numbers, dates, and special characters as they are.
-                    8. Maintain the exact same structure and format.
-                    9. Respond ONLY with the translated JSON data, maintaining the exact same keys.
+                    7. Maintain the exact same structure and format.
+                    8. Respond ONLY with the translated JSON data, maintaining the exact same keys.
 
                     When translating, consider the character's personality and background when available.
 
@@ -58,10 +57,9 @@ export async function POST(request) {
       input: [
         {
           role: "user",
-          content: `Make the English translation sound natural while keeping the overall context in mind.
-                    1. Only translate the text content, keeping all numbers, dates, and special characters as they are.
-                    2. Maintain the exact same structure and format.
-                    3. Respond ONLY with the translated JSON data, maintaining the exact same keys.
+          content: `Make the English translation sound more natural and adjust the text in accordance with the overall conversation context.
+                    1. Maintain the exact same structure and format.
+                    2. Respond ONLY with the translated JSON data, maintaining the exact same keys.
                     `,
         },
       ],
