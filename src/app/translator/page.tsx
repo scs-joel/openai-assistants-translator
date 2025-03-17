@@ -17,6 +17,26 @@ export default function Translator() {
   const [progress, setProgress] = useState(0);
   const [lastResponseId, setLastResponseId] = useState(null);
   const [error, setError] = useState(null);
+  const [initialPrompt, setInitialPrompt] = useState(
+    `You are a specialized translator for Japanese game dialog to English. Your task is to:
+
+    1. Translate the following CSV data into natural, conversational English
+    2. Preserve character voice, emotional tone, and cultural context
+    3. Handle hesitations (...), emphasis, and strong emotions authentically
+    4. Focus on how English speakers would naturally express these ideas
+    5. Remember you are being given a script
+    6. Output only the translations with no explanations.
+    7. Maintain the exact same structure and format.
+    8. Respond ONLY with the translated JSON data, maintaining the exact same keys.
+
+    When translating, consider the character's personality and background when available.`,
+  );
+  const [refinementPrompt, setRefinementPrompt] = useState(
+    `Make the English translation sound natural while keeping the overall context in mind.
+    1. Only translate the text content, keeping all numbers, dates, and special characters as they are.
+    2. Maintain the exact same structure and format.
+    3. Respond ONLY with the translated JSON data, maintaining the exact same keys.`,
+  );
 
   const fileInputRef = useRef(null);
 
@@ -86,6 +106,8 @@ export default function Translator() {
             totalRows: csvData.length,
             currentIndex: i,
             apikey: openaiApiKey,
+            initialPrompt,
+            refinementPrompt,
           }),
         });
 
@@ -159,6 +181,36 @@ export default function Translator() {
           />
           <p className="mt-1 text-xs text-gray-500">
             Your OpenAI Api Key. Necessary to make use of this application.
+          </p>
+        </div>
+
+        <div className="mb-8">
+          <label className="mb-1 block text-sm font-medium">
+            Initial Translation Prompt
+          </label>
+          <textarea
+            value={initialPrompt}
+            onChange={(e) => setInitialPrompt(e.target.value)}
+            className="block w-full rounded border border-gray-300 p-2 text-sm h-48 font-mono"
+            placeholder="Enter the initial translation prompt"
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            This prompt guides the initial translation of the text.
+          </p>
+        </div>
+
+        <div className="mb-8">
+          <label className="mb-1 block text-sm font-medium">
+            Refinement Prompt
+          </label>
+          <textarea
+            value={refinementPrompt}
+            onChange={(e) => setRefinementPrompt(e.target.value)}
+            className="block w-full rounded border border-gray-300 p-2 text-sm h-32 font-mono"
+            placeholder="Enter the refinement prompt"
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            This prompt guides the refinement of the initial translation.
           </p>
         </div>
 

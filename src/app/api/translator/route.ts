@@ -14,6 +14,8 @@ export async function POST(request) {
       totalRows,
       currentIndex,
       apikey,
+      initialPrompt,
+      refinementPrompt,
     } = await request.json();
 
     // Initialize the OpenAI client
@@ -26,18 +28,7 @@ export async function POST(request) {
     const csvChunk = JSON.parse(data);
 
     // Build context and instructions for translation
-    const prompt = `You are a specialized translator for Japanese game dialog to English. Your task is to:
-
-                    1. Translate the following CSV data into natural, conversational English
-                    2. Preserve character voice, emotional tone, and cultural context
-                    3. Handle hesitations (...), emphasis, and strong emotions authentically
-                    4. Focus on how English speakers would naturally express these ideas
-                    5. Remember you are being given a script
-                    6. Output only the translations with no explanations.
-                    7. Maintain the exact same structure and format.
-                    8. Respond ONLY with the translated JSON data, maintaining the exact same keys.
-
-                    When translating, consider the character's personality and background when available.
+    const prompt = `${initialPrompt}
 
                     Here is the data to translate (rows ${currentIndex + 1} to ${currentIndex + csvChunk.length} out of ${totalRows} total rows):
                     ${JSON.stringify(csvChunk, null, 2)}`;
@@ -57,10 +48,7 @@ export async function POST(request) {
       input: [
         {
           role: "user",
-          content: `Make the English translation sound more natural and adjust the text in accordance with the overall conversation context.
-                    1. Maintain the exact same structure and format.
-                    2. Respond ONLY with the translated JSON data, maintaining the exact same keys.
-                    `,
+          content: refinementPrompt,
         },
       ],
       store: true,
