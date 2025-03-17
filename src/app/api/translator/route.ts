@@ -16,6 +16,8 @@ export async function POST(request) {
       apikey,
       initialPrompt,
       refinementPrompt,
+      model,
+      temperature,
     } = await request.json();
 
     // Initialize the OpenAI client
@@ -35,15 +37,15 @@ export async function POST(request) {
 
     // Create the API request
     const response = await openai.responses.create({
-      model: "gpt-4o", // You can use a different model as needed
+      model: model || "gpt-4o", // Use provided model or fallback to gpt-4
       input: prompt,
       store: true,
       ...(previousResponseId && { previous_response_id: previousResponseId }),
-      temperature: 1,
+      temperature: temperature ?? 1, // Use provided temperature or fallback to 1
     });
 
     const secondResponse = await openai.responses.create({
-      model: "gpt-4o",
+      model: model || "gpt-4o", // Use provided model or fallback to gpt-4
       previous_response_id: response.id,
       input: [
         {
@@ -52,7 +54,7 @@ export async function POST(request) {
         },
       ],
       store: true,
-      temperature: 1,
+      temperature: temperature ?? 1, // Use provided temperature or fallback to 1
     });
     console.log("received translation");
 

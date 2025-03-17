@@ -17,6 +17,8 @@ export default function Translator() {
   const [progress, setProgress] = useState(0);
   const [lastResponseId, setLastResponseId] = useState(null);
   const [error, setError] = useState(null);
+  const [model, setModel] = useState("gpt-4o");
+  const [temperature, setTemperature] = useState(1);
   const [initialPrompt, setInitialPrompt] = useState(
     `You are a specialized translator for Japanese game dialog to English. Your task is to:
 
@@ -108,6 +110,8 @@ export default function Translator() {
             apikey: openaiApiKey,
             initialPrompt,
             refinementPrompt,
+            model,
+            temperature,
           }),
         });
 
@@ -240,7 +244,6 @@ export default function Translator() {
               value={sourceLanguage}
               onChange={(e) => setSourceLanguage(e.target.value)}
               className="border p-2 rounded bg-gray-200 text-gray-500/50 w-36"
-              //disabled={isTranslating}
               disabled
             >
               <option value="auto">Auto-detect</option>
@@ -261,7 +264,6 @@ export default function Translator() {
               value={targetLanguage}
               onChange={(e) => setTargetLanguage(e.target.value)}
               className="border p-2 rounded bg-gray-200 text-gray-500/50 w-36"
-              //disabled={isTranslating}
               disabled
             >
               <option value="en">English</option>
@@ -274,6 +276,43 @@ export default function Translator() {
               <option value="zh">Chinese</option>
               <option value="ru">Russian</option>
             </select>
+          </div>
+        </div>
+
+        <div className="mb-8 flex justify-center space-x-4">
+          <div>
+            <label className="block mb-2">Model:</label>
+            <select
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              className="border p-2 rounded w-48"
+              disabled={isTranslating}
+            >
+              <option value="gpt-4o">GPT-4o (Most Capable)</option>
+              <option value="gpt-4o-mini">
+                GPT-4o-mini (Fast and affordable)
+              </option>
+              <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Faster)</option>
+            </select>
+          </div>
+          <div>
+            <label className="block mb-2">Temperature:</label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="range"
+                min="0"
+                max="2"
+                step="0.1"
+                value={temperature}
+                onChange={(e) => setTemperature(parseFloat(e.target.value))}
+                className="w-32"
+                disabled={isTranslating}
+              />
+              <span className="w-12 text-center">{temperature}</span>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              0 = More precise, 2 = More creative
+            </p>
           </div>
         </div>
 
