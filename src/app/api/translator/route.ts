@@ -45,15 +45,15 @@ export async function POST(request) {
 
     // Create the API request
     const response = await openai.responses.create({
-      model: "gpt-4o-mini", // You can use a different model as needed
+      model: "gpt-4o", // You can use a different model as needed
       input: prompt,
       store: true,
       ...(previousResponseId && { previous_response_id: previousResponseId }),
-      temperature: 0.7,
+      temperature: 1,
     });
 
     const secondResponse = await openai.responses.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       previous_response_id: response.id,
       input: [
         {
@@ -66,7 +66,7 @@ export async function POST(request) {
         },
       ],
       store: true,
-      temperature: 0.7,
+      temperature: 1,
     });
     console.log("received translation");
 
