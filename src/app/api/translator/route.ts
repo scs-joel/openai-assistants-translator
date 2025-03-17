@@ -1,7 +1,7 @@
 // File: app/api/translate/route.js
 //import OpenAI from "openai";
 
-export const maxDuration = 120; // Set to the maximum allowed by your Vercel plan
+export const maxDuration = 300; // Set to the maximum allowed by your Vercel plan
 import { openai } from "@/config/openai";
 
 export async function POST(request) {
