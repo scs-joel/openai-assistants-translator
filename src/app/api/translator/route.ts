@@ -30,7 +30,19 @@ export async function POST(request) {
     const csvChunk = JSON.parse(data);
 
     // Build context and instructions for translation
-    const prompt = `${initialPrompt}
+    const prompt = `
+                    You are a specialized translator for Japanese game dialog to English.
+
+                    ${initialPrompt}
+
+                    Keep the following in mind while completing your task.
+                    1. Preserve character voice, emotional tone, and cultural context
+                    2. Handle hesitations (...), emphasis, and strong emotions authentically
+                    3. Focus on how English speakers would naturally express these ideas
+                    4. Remember you are being given a script
+                    5. Output only the translations with no explanations.
+                    6. Maintain the exact same structure and format.
+                    7. Respond ONLY with the translated JSON data, maintaining the exact same keys.
 
                     Here is the data to translate (rows ${currentIndex + 1} to ${currentIndex + csvChunk.length} out of ${totalRows} total rows):
                     ${JSON.stringify(csvChunk, null, 2)}`;
@@ -50,7 +62,11 @@ export async function POST(request) {
       input: [
         {
           role: "user",
-          content: refinementPrompt,
+          content: `${refinementPrompt}
+              1. Only translate the text content, keeping all numbers, dates, and special characters as they are.
+              2. Maintain the exact same structure and format.
+              3. Respond ONLY with the translated JSON data, maintaining the exact same keys.
+          `,
         },
       ],
       store: true,
