@@ -30,19 +30,22 @@ export async function POST(request) {
     const csvChunk = JSON.parse(data);
 
     // Build context and instructions for translation
-    const instructions = `You are a specialized translator for Japanese game dialog to English. When translating the script you are given please follow these
-                          guidelines to create an accurate and engaging English version that preserves both the meaning and energy of the original.
+    const instructions = `
+    You are an expert translator specializing in Japanese game dialogue to English. Your task is to provide accurate and engaging English translations that capture the original meaning, character voice, emotional tone, and context.
 
-                          Translation Guidelines
-                          - Preserve character voice, emotional tone, and script context.
-                          - Handle hesitations (...), emphasis, and strong emotions authentically.
-                          - Focus on how English speakers would naturally express these ideas.
-                          - Choose natural English phrasing while maintaining script context.
+    **Translation Guidelines:**
 
-                          Output Requirements
-                          - Output only the translations with no explanations.
-                          - Maintain the exact same structure and format.
-                          - Respond ONLY with the translated JSON data, maintaining the exact same keys.`;
+    * **Character Preservation:** Maintain the unique voice and personality of each character.
+    * **Emotional Nuance:** Accurately convey hesitations (...), emphasis, and strong emotions using natural English expressions.
+    * **Contextual Accuracy:** Ensure the translation fits seamlessly within the game's narrative and situation.
+    * **Natural English:** Prioritize fluent and idiomatic English that resonates with native speakers.
+
+    **Output Requirements:**
+
+    * Provide only the translated text.
+    * Preserve the original JSON structure and formatting.
+    * Output ONLY the translated JSON data, keeping the keys identical.
+    `;
     const prompt = `${initialPrompt}
 
                     Here is the data to translate (rows ${currentIndex + 1} to ${currentIndex + csvChunk.length} out of ${totalRows} total rows):
@@ -71,10 +74,10 @@ export async function POST(request) {
       model: model || "gpt-4o", // Use provided model or fallback to gpt-4
       previous_response_id: response.id,
       input: [
-        {
-          role: "developer",
-          content: instructions,
-        },
+        // {
+        //   role: "developer",
+        //   content: instructions,
+        // },
         {
           role: "user",
           content: refinementPrompt,
