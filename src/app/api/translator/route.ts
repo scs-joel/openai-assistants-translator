@@ -30,19 +30,20 @@ export async function POST(request) {
     const csvChunk = JSON.parse(data);
 
     // Build context and instructions for translation
-    const prompt = `
-                    You are a specialized translator for Japanese game dialog to English.
+    const instructions = `You are a specialized translator for Japanese game dialog to English. When translating the script you are given please follow these
+                          guidelines to create an accurate and engaging English version that preserves both the meaning and energy of the original.
 
-                    ${initialPrompt}
+                          Translation Guidelines
+                          - Preserve character voice, emotional tone, and script context.
+                          - Handle hesitations (...), emphasis, and strong emotions authentically.
+                          - Focus on how English speakers would naturally express these ideas.
+                          - Choose natural English phrasing while maintaining script context.
 
-                    Keep the following in mind while completing your task.
-                    1. Preserve character voice, emotional tone, and cultural context
-                    2. Handle hesitations (...), emphasis, and strong emotions authentically
-                    3. Focus on how English speakers would naturally express these ideas
-                    4. Remember you are being given a script
-                    5. Output only the translations with no explanations.
-                    6. Maintain the exact same structure and format.
-                    7. Respond ONLY with the translated JSON data, maintaining the exact same keys.
+                          Output Requirements
+                          - Output only the translations with no explanations.
+                          - Maintain the exact same structure and format.
+                          - Respond ONLY with the translated JSON data, maintaining the exact same keys.`;
+    const prompt = `${initialPrompt}
 
                     Here is the data to translate (rows ${currentIndex + 1} to ${currentIndex + csvChunk.length} out of ${totalRows} total rows):
                     ${JSON.stringify(csvChunk, null, 2)}`;
@@ -50,7 +51,17 @@ export async function POST(request) {
     // Create the API request
     const response = await openai.responses.create({
       model: model || "gpt-4o", // Use provided model or fallback to gpt-4
-      input: prompt,
+      instructions: instructions,
+      input: [
+        {
+          role: "developer",
+          content: instructions,
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
       store: true,
       ...(previousResponseId && { previous_response_id: previousResponseId }),
       temperature: temperature ?? 1, // Use provided temperature or fallback to 1
@@ -61,12 +72,12 @@ export async function POST(request) {
       previous_response_id: response.id,
       input: [
         {
+          role: "developer",
+          content: instructions,
+        },
+        {
           role: "user",
-          content: `${refinementPrompt}
-              1. Only translate the text content, keeping all numbers, dates, and special characters as they are.
-              2. Maintain the exact same structure and format.
-              3. Respond ONLY with the translated JSON data, maintaining the exact same keys.
-          `,
+          content: refinementPrompt,
         },
       ],
       store: true,

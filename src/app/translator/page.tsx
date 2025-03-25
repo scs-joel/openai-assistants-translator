@@ -75,7 +75,7 @@ When translating, consider the character's personality and background when avail
 
     try {
       // Process in chunks to handle API limits
-      const CHUNK_SIZE = 10; // Adjust based on token limits
+      const CHUNK_SIZE = 20; // Adjust based on token limits
 
       for (let i = startIndex; i < csvData.length; i += CHUNK_SIZE) {
         const chunk = csvData.slice(i, i + CHUNK_SIZE);
@@ -281,7 +281,6 @@ When translating, consider the character's personality and background when avail
               <option value="gpt-4o-mini">
                 GPT-4o-mini (Fast and affordable)
               </option>
-              <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Faster)</option>
             </select>
           </div>
           <div>
