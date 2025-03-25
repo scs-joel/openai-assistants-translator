@@ -3,28 +3,6 @@
 export const maxDuration = 300; // Set to the maximum allowed by your Vercel plan
 import { openai } from "@/config/openai";
 
-const schema = {
-  type: "object",
-  properties: {
-    rows: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          Label: { type: "string" },
-          CharacterName: { type: "string" },
-          Japanese: { type: "string" },
-          English: { type: "string" },
-        },
-        required: ["Label", "CharacterName", "Japanese", "English"],
-        additionalProperties: false,
-      },
-    },
-  },
-  required: ["rows"],
-  additionalProperties: false,
-};
-
 function generateStringArraySchema(keys) {
   if (!keys || !Array.isArray(keys) || keys.length === 0) {
     return {
