@@ -91,6 +91,7 @@ When translating, consider the character's personality and background when avail
           },
           body: JSON.stringify({
             data: chunkForTranslation,
+            columns: columns,
             sourceLanguage,
             targetLanguage,
             previousResponseId: lastResponseId,
