@@ -143,28 +143,41 @@ export async function POST(request) {
     });
     console.log("received translation");
 
-    // Parse the response to get the translated data
-    let translatedData;
+    // Parse both responses to get the translated data
+    let firstTranslation, secondTranslation, combinedTranslations;
     try {
-      // The response should be a JSON string
-      const outputText = secondResponse.output_text.trim();
-      translatedData = JSON.parse(outputText);
+      // Parse first translation
+      const firstOutputText = response.output_text.trim();
+      firstTranslation = JSON.parse(firstOutputText);
+
+      // Parse second translation
+      const secondOutputText = secondResponse.output_text.trim();
+      secondTranslation = JSON.parse(secondOutputText);
+
+      // Get the last property name from the first row
+      const lastProperty = Object.keys(secondTranslation.rows[0]).pop();
+
+      // Combine translations by adding only the last property from refined version
+      combinedTranslations = firstTranslation.rows.map((row, index) => ({
+        ...row,
+        ["refined"]: secondTranslation.rows[index][lastProperty],
+      }));
     } catch (parseError) {
-      console.error("Failed to parse translation result:", parseError);
+      console.error("Failed to parse translation results:", parseError);
       return Response.json(
         {
-          error: "Failed to parse translation result",
+          error: "Failed to parse translation results",
           message: parseError.message,
         },
         { status: 500 },
       );
     }
 
-    // Return the translated data and the response ID for continuity
+    // Return combined translations and the response ID for continuity
     return Response.json({
-      translatedData: translatedData.rows,
+      translatedData: combinedTranslations,
       responseId: response.id,
-      message: `Successfully translated rows ${currentIndex + 1} to ${currentIndex + translatedData.rows.length}`,
+      message: `Successfully translated rows ${currentIndex + 1} to ${currentIndex + combinedTranslations.length}`,
     });
   } catch (error) {
     console.error("Translation API error:", error);

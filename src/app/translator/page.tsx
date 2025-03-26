@@ -110,7 +110,7 @@ When translating, consider the character's personality and background when avail
         }
 
         const result = await response.json();
-
+        setColumns((prev) => [...prev, "Refined"]);
         // Update state with the translated chunk
         setTranslatedData((prev) => [...prev, ...result.translatedData]);
         setLastResponseId(result.responseId);
@@ -366,7 +366,7 @@ When translating, consider the character's personality and background when avail
               </thead>
               <tbody>
                 {(translatedData.length > 0 ? translatedData : csvData)
-                  .slice(0, 5)
+                  //.slice(0, 5)
                   .map((row, rowIndex) => (
                     <tr key={rowIndex}>
                       {columns.map((column, colIndex) => (
@@ -378,11 +378,14 @@ When translating, consider the character's personality and background when avail
                   ))}
               </tbody>
             </table>
-            {csvData.length > 5 && (
+            {csvData.length > 0 && (
+              <p className="text-center mt-2">{csvData.length} total rows</p>
+            )}
+            {/* {csvData.length > 5 && (
               <p className="text-center mt-2">
                 Showing first 5 rows of {csvData.length} total rows
               </p>
-            )}
+            )} */}
           </div>
         )}
       </div>
