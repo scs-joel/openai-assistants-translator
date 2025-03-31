@@ -17,8 +17,8 @@ export default function Translator() {
   const [progress, setProgress] = useState(0);
   const [lastResponseId, setLastResponseId] = useState(null);
   const [error, setError] = useState(null);
-  const [model, setModel] = useState("gpt-4o");
-  const [temperature, setTemperature] = useState(1);
+  const [model, setModel] = useState("chatgpt-4o-latest");
+  const [temperature, setTemperature] = useState(0.5);
   const [initialPrompt, setInitialPrompt] = useState(
     `Translate the following Japanese text to English.
 Make the English translation sound natural while keeping the overall context in mind.
@@ -278,8 +278,11 @@ When translating, consider the character's personality and background when avail
               className="border p-2 rounded w-48"
               disabled={isTranslating}
             >
-              <option value="gpt-4o">GPT-4o (Most Capable)</option>
-              <option value="gpt-4o-mini">
+              <option value="chatgpt-4o-latest">
+                ChatGPT-4o Latest (Most Capable & Most Expensive)
+              </option>
+              <option value="gpt-4o">GPT-4o (Baseline)</option>
+              <option value="gpt-4o-mini-latest">
                 GPT-4o-mini (Fast and affordable)
               </option>
             </select>

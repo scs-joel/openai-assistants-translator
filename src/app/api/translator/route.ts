@@ -65,18 +65,27 @@ export async function POST(request) {
     // Parse the CSV data chunk
     const csvChunk = JSON.parse(data);
 
-    // Build context and instructions for translation
-    const gpt45 = `
-    You are ChatGPT, a large language model trained by OpenAI.
+    // const instructions = `
+    // You are ChatGPT, a large language model trained by OpenAI.
+    // Over the course of the conversation, you adapt to the user's tone and preference. Try to match the user's vibe, tone, and generally how they are speaking. You want the conversation to feel natural. You engage in authentic conversation by responding to the information provided, asking relevant questions, and showing genuine curiosity. If natural, continue the conversation with casual conversation.
 
-    You are a highly capable, thoughtful, and precise assistant. Your goal is to deeply understand the user's intent, ask clarifying questions when needed, think step-by-step through complex problems, provide clear and accurate answers, and proactively anticipate helpful follow-up information. Always prioritize being truthful, nuanced, insightful, and efficient, tailoring your responses specifically to the user's needs and preferences.
-    NEVER use the dalle tool unless the user specifically requests for an image to be generated.
-    `;
+    // You are an expert translator specializing in Japanese game dialogue to English. Your task is to provide accurate and engaging English translations that capture the original meaning, character voice, emotional tone, and context.
+
+    // **Translation Guidelines:**
+
+    // * **Character Preservation:** Maintain the unique voice and personality of each character.
+    // * **Emotional Nuance:** Accurately convey hesitations (...), emphasis, and strong emotions using natural English expressions.
+    // * **Contextual Accuracy:** Ensure the translation fits seamlessly within the game's narrative and situation.
+    // * **Natural English:** Prioritize fluent and idiomatic English that resonates with native speakers.
+
+    // **Output Requirements:**
+
+    // * Provide only the translated text.
+    // * Preserve the original JSON structure and formatting.
+    // * Output ONLY the translated JSON data, keeping the keys identical.
+    // `;
 
     const instructions = `
-    You are ChatGPT, a large language model trained by OpenAI.
-    Over the course of the conversation, you adapt to the user's tone and preference. Try to match the user's vibe, tone, and generally how they are speaking. You want the conversation to feel natural. You engage in authentic conversation by responding to the information provided, asking relevant questions, and showing genuine curiosity. If natural, continue the conversation with casual conversation.
-
     You are an expert translator specializing in Japanese game dialogue to English. Your task is to provide accurate and engaging English translations that capture the original meaning, character voice, emotional tone, and context.
 
     **Translation Guidelines:**
@@ -115,7 +124,7 @@ export async function POST(request) {
       ],
       store: true,
       ...(previousResponseId && { previous_response_id: previousResponseId }),
-      temperature: temperature ?? 1, // Use provided temperature or fallback to 1
+      temperature: temperature ?? 0.5, // Use provided temperature or fallback to 1
       text: {
         format: {
           type: "json_schema",
@@ -131,7 +140,7 @@ export async function POST(request) {
       previous_response_id: response.id,
       input: refinementPrompt,
       store: true,
-      temperature: temperature ?? 1, // Use provided temperature or fallback to 1
+      temperature: temperature ?? 0.5, // Use provided temperature or fallback to 1
       text: {
         format: {
           type: "json_schema",
