@@ -134,7 +134,7 @@ export async function POST(request) {
         },
       },
     });
-
+    //TODO: Make this optional
     const secondResponse = await openai.responses.create({
       model: model || "gpt-4o", // Use provided model or fallback to gpt-4
       previous_response_id: response.id,

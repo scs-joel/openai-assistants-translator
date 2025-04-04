@@ -24,6 +24,7 @@ export default function Translator() {
 Make the English translation sound natural while keeping the overall context in mind.
 When translating, consider the character's personality and background when available.`,
   );
+  //TODO: Make this optional
   const [refinementPrompt, setRefinementPrompt] = useState(
     `Make the English translation sound natural while keeping the overall context in mind.
     `,
