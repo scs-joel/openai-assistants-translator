@@ -179,10 +179,24 @@ export async function POST(request) {
 
       // If spell check is enabled, add error markers
       if (enableSpellCheck) {
-        processedData = processedData.map(row => ({
-          ...row,
-          ["Errors"]: row.Errors || "No errors found"
-        }));
+        processedData = processedData.map(row => {
+          const errors = row.Errors || "No errors found";
+          // Add a star marker in the cell to the right if there are errors
+          const rowWithMarker = { ...row };
+          if (errors !== "No errors found") {
+            // Find the last column that has content
+            const lastColumn = Object.keys(row).reduce((last, key) => {
+              return row[key] ? key : last;
+            }, "");
+            // Add a star marker in the next column
+            const nextColumn = String.fromCharCode(lastColumn.charCodeAt(0) + 1);
+            rowWithMarker[nextColumn] = "*";
+          }
+          return {
+            ...rowWithMarker,
+            ["Errors"]: errors
+          };
+        });
       }
 
     } catch (parseError) {

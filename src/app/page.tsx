@@ -23,7 +23,9 @@ export default function Translator() {
   const [showPrompts, setShowPrompts] = useState(false);
   const [enableRefinement, setEnableRefinement] = useState(false);
   const [enableSpellCheck, setEnableSpellCheck] = useState(false);
-  const [operationMode, setOperationMode] = useState<'translate' | 'spellcheck'>('translate');
+  const [operationMode, setOperationMode] = useState<
+    "translate" | "spellcheck"
+  >("translate");
   const [initialPrompt, setInitialPrompt] = useState(
     `Translate the following Japanese text to English.
 Make the English translation sound natural while keeping the overall context in mind.
@@ -119,11 +121,11 @@ When translating, consider the character's personality and background when avail
         const result = await response.json();
 
         // Update columns based on operation mode
-        if (operationMode === 'translate' && enableRefinement) {
+        if (operationMode === "translate" && enableRefinement) {
           setColumns((prev) => [...prev, "Refined"]);
         }
         if (enableSpellCheck) {
-          setColumns((prev) => [...prev, "Errors"]);
+          setColumns((prev) => [...prev, "Errors", "Markers"]);
         }
 
         // Update state with the processed chunk
@@ -198,8 +200,8 @@ When translating, consider the character's personality and background when avail
             <label className="flex items-center gap-2">
               <input
                 type="radio"
-                checked={operationMode === 'translate'}
-                onChange={() => setOperationMode('translate')}
+                checked={operationMode === "translate"}
+                onChange={() => setOperationMode("translate")}
                 className="h-4 w-4"
               />
               Translate
@@ -207,15 +209,18 @@ When translating, consider the character's personality and background when avail
             <label className="flex items-center gap-2">
               <input
                 type="radio"
-                checked={operationMode === 'spellcheck'}
-                onChange={() => {setOperationMode('spellcheck'); setEnableRefinement(true)}}
+                checked={operationMode === "spellcheck"}
+                onChange={() => {
+                  setOperationMode("spellcheck");
+                  setEnableRefinement(true);
+                }}
                 className="h-4 w-4"
               />
               Spell Check Only
             </label>
           </div>
 
-          {operationMode === 'translate' && (
+          {operationMode === "translate" && (
             <>
               <div className="flex items-center gap-2">
                 <input
@@ -240,16 +245,24 @@ When translating, consider the character's personality and background when avail
                   checked={enableRefinement}
                   onChange={(e) => setEnableRefinement(e.target.checked)}
                   disabled={!showPrompts}
-                  className={`h-4 w-4 ${!showPrompts ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`h-4 w-4 ${!showPrompts ? "opacity-50 cursor-not-allowed" : ""}`}
                 />
-                <label htmlFor="enableRefinement" className={!showPrompts ? 'opacity-50' : ''}>
+                <label
+                  htmlFor="enableRefinement"
+                  className={!showPrompts ? "opacity-50" : ""}
+                >
                   Enable Refinement
                 </label>
               </div>
             </>
           )}
 
-          <div className={cn("flex items-center gap-2", operationMode === 'spellcheck' && 'hidden')}>
+          <div
+            className={cn(
+              "flex items-center gap-2",
+              operationMode === "spellcheck" && "hidden",
+            )}
+          >
             <input
               type="checkbox"
               id="enableSpellCheck"
@@ -261,7 +274,7 @@ When translating, consider the character's personality and background when avail
           </div>
         </div>
 
-        {operationMode === 'translate' && showPrompts && (
+        {operationMode === "translate" && showPrompts && (
           <>
             <div className="mb-8">
               <label className="mb-1 block text-sm font-medium">
