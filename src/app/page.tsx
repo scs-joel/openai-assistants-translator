@@ -1,8 +1,9 @@
 "use client";
 
-import { cn } from "@/utils";
 import Papa from "papaparse";
 import React, { useRef, useState } from "react";
+
+import { cn } from "@/utils";
 
 export default function Translator() {
   const [openaiApiKey, setOpenAIApiKey] = useState<string>("");
@@ -212,7 +213,7 @@ When translating, consider the character's personality and background when avail
                 checked={operationMode === "spellcheck"}
                 onChange={() => {
                   setOperationMode("spellcheck");
-                  setEnableRefinement(true);
+                  setEnableSpellCheck(true);
                 }}
                 className="h-4 w-4"
               />
@@ -413,9 +414,8 @@ When translating, consider the character's personality and background when avail
         <div className="mb-8 flex justify-center">
           <button
             onClick={translateCSV}
-            className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ${
-              isTranslating ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ${isTranslating ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             disabled={isTranslating || csvData.length === 0}
           >
             {isTranslating
