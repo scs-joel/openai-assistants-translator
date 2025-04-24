@@ -23,10 +23,7 @@ export default function Translator() {
   const [temperature, setTemperature] = useState(0.5);
   const [showPrompts, setShowPrompts] = useState(false);
   const [enableRefinement, setEnableRefinement] = useState(false);
-  const [enableSpellCheck, setEnableSpellCheck] = useState(false);
-  const [operationMode, setOperationMode] = useState<
-    "translate" | "spellcheck"
-  >("translate");
+  const [operationMode, setOperationMode] = useState<"translate">("translate");
   const [initialPrompt, setInitialPrompt] = useState(
     `Translate the following Japanese text to English.
 Make the English translation sound natural while keeping the overall context in mind.
@@ -111,7 +108,6 @@ When translating, consider the character's personality and background when avail
             model,
             temperature,
             operationMode,
-            enableSpellCheck,
           }),
         });
 
@@ -124,9 +120,6 @@ When translating, consider the character's personality and background when avail
         // Update columns based on operation mode
         if (operationMode === "translate" && enableRefinement) {
           setColumns((prev) => [...prev, "Refined"]);
-        }
-        if (enableSpellCheck) {
-          setColumns((prev) => [...prev, "Errors", "Markers"]);
         }
 
         // Update state with the processed chunk
@@ -207,18 +200,6 @@ When translating, consider the character's personality and background when avail
               />
               Translate
             </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                checked={operationMode === "spellcheck"}
-                onChange={() => {
-                  setOperationMode("spellcheck");
-                  setEnableSpellCheck(true);
-                }}
-                className="h-4 w-4"
-              />
-              Spell Check Only
-            </label>
           </div>
 
           {operationMode === "translate" && (
@@ -257,22 +238,6 @@ When translating, consider the character's personality and background when avail
               </div>
             </>
           )}
-
-          <div
-            className={cn(
-              "flex items-center gap-2",
-              operationMode === "spellcheck" && "hidden",
-            )}
-          >
-            <input
-              type="checkbox"
-              id="enableSpellCheck"
-              checked={enableSpellCheck}
-              onChange={(e) => setEnableSpellCheck(e.target.checked)}
-              className="h-4 w-4"
-            />
-            <label htmlFor="enableSpellCheck">Enable Spell Check</label>
-          </div>
         </div>
 
         {operationMode === "translate" && showPrompts && (
@@ -416,35 +381,18 @@ When translating, consider the character's personality and background when avail
         </div>
 
         <div className="mb-8 flex justify-center">
-          {
-            operationMode === 'translate' ?
-
-              <button
-                onClick={translateCSV}
-                className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ${isTranslating ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                disabled={isTranslating || csvData.length === 0}
-              >
-                {isTranslating
-                  ? "Translating..."
-                  : translatedData.length > 0
-                    ? "Continue Translation"
-                    : "Start Translation"}
-              </button> :
-
-              <button
-                onClick={translateCSV}
-                className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ${isTranslating ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                disabled={isTranslating || csvData.length === 0}
-              >
-                {isTranslating
-                  ? "Checking..."
-                  : translatedData.length > 0
-                    ? "Continue Spelling and Grammar Check"
-                    : "Start Spelling and Grammar Check"}
-              </button>
-          }
+          <button
+            onClick={translateCSV}
+            className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ${isTranslating ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            disabled={isTranslating || csvData.length === 0}
+          >
+            {isTranslating
+              ? "Translating..."
+              : translatedData.length > 0
+                ? "Continue Translation"
+                : "Start Translation"}
+          </button>
         </div>
 
         {error && <div className="mb-8 text-red-500 text-center">{error}</div>}
