@@ -23,7 +23,7 @@ export default function Translator() {
   const [temperature, setTemperature] = useState(0.5);
   const [showPrompts, setShowPrompts] = useState(false);
   const [enableRefinement, setEnableRefinement] = useState(false);
-  const [operationMode, setOperationMode] = useState<"translate">("translate");
+  const [operationMode, setOperationMode] = useState<"translate" | "check">("translate");
   const [initialPrompt, setInitialPrompt] = useState(
     `Translate the following Japanese text to English.
 Make the English translation sound natural while keeping the overall context in mind.
@@ -33,6 +33,8 @@ When translating, consider the character's personality and background when avail
     `Make the English translation sound natural while keeping the overall context in mind.
     `,
   );
+  const [checkedData, setCheckedData] = useState([]);
+  const [isChecking, setIsChecking] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -145,6 +147,72 @@ When translating, consider the character's personality and background when avail
     }
   };
 
+  const checkCSV = async () => {
+    if (csvData.length === 0) {
+      setError("Please upload a CSV file first.");
+      return;
+    }
+
+    setIsChecking(true);
+    setError(null);
+
+    // Start from where we left off or from the beginning
+    const startIndex = checkedData.length;
+
+    try {
+      // Process in chunks to handle API limits
+      const CHUNK_SIZE = 20; // Adjust based on token limits
+
+      for (let i = startIndex; i < csvData.length; i += CHUNK_SIZE) {
+        const chunk = csvData.slice(i, i + CHUNK_SIZE);
+
+        // Prepare the chunk for checking
+        const chunkForChecking = JSON.stringify(chunk);
+
+        // Create the API request
+        const response = await fetch("/api/checker", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            data: chunkForChecking,
+            columns: columns,
+            language: targetLanguage,
+            apikey: openaiApiKey,
+            model,
+            temperature,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        // Update state with the processed chunk
+        setCheckedData((prev) => [...prev, ...result.checkedData]);
+        setProgress(
+          Math.min(
+            100,
+            Math.round(
+              ((i + result.checkedData.length) / csvData.length) * 100,
+            ),
+          ),
+        );
+
+        // If we're at the end, we're done
+        if (i + CHUNK_SIZE >= csvData.length) {
+          setIsChecking(false);
+        }
+      }
+    } catch (err) {
+      setError(`Processing error: ${err.message}`);
+      setIsChecking(false);
+    }
+  };
+
   const downloadTranslatedCSV = () => {
     if (translatedData.length === 0) {
       setError("No translated data to download.");
@@ -157,6 +225,35 @@ When translating, consider the character's personality and background when avail
     const link = document.createElement("a");
     link.setAttribute("href", url);
     link.setAttribute("download", `translated_${fileName}`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const downloadCheckedCSV = () => {
+    if (checkedData.length === 0) {
+      setError("No checked data to download.");
+      return;
+    }
+
+    // Add stars to cells with mistakes
+    const processedData = csvData.map((row, rowIndex) => {
+      const newRow = { ...row };
+      columns.forEach((column) => {
+        if (checkedData[rowIndex]?.[column]) {
+          newRow[`${column}_Mistakes`] = "★";
+        }
+      });
+      return newRow;
+    });
+
+    const csv = Papa.unparse(processedData);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `checked_${fileName}`);
     link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
@@ -199,6 +296,15 @@ When translating, consider the character's personality and background when avail
                 className="h-4 w-4"
               />
               Translate
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                checked={operationMode === "check"}
+                onChange={() => setOperationMode("check")}
+                className="h-4 w-4"
+              />
+              Check
             </label>
           </div>
 
@@ -344,7 +450,7 @@ When translating, consider the character's personality and background when avail
               value={model}
               onChange={(e) => setModel(e.target.value)}
               className="border p-2 rounded w-48"
-              disabled={isTranslating}
+              disabled={isTranslating || isChecking}
             >
               <option value="gpt-4.1-2025-04-14">
                 GPT-4.1 Flagship GPT model for complex tasks
@@ -370,7 +476,7 @@ When translating, consider the character's personality and background when avail
                 value={temperature}
                 onChange={(e) => setTemperature(parseFloat(e.target.value))}
                 className="w-32"
-                disabled={isTranslating}
+                disabled={isTranslating || isChecking}
               />
               <span className="w-12 text-center">{temperature}</span>
             </div>
@@ -382,16 +488,22 @@ When translating, consider the character's personality and background when avail
 
         <div className="mb-8 flex justify-center">
           <button
-            onClick={translateCSV}
-            className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ${isTranslating ? "opacity-50 cursor-not-allowed" : ""
+            onClick={operationMode === "translate" ? translateCSV : checkCSV}
+            className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ${(isTranslating || isChecking) ? "opacity-50 cursor-not-allowed" : ""
               }`}
-            disabled={isTranslating || csvData.length === 0}
+            disabled={(isTranslating || isChecking) || csvData.length === 0}
           >
             {isTranslating
               ? "Translating..."
-              : translatedData.length > 0
-                ? "Continue Translation"
-                : "Start Translation"}
+              : isChecking
+                ? "Checking..."
+                : operationMode === "translate"
+                  ? translatedData.length > 0
+                    ? "Continue Translation"
+                    : "Start Translation"
+                  : checkedData.length > 0
+                    ? "Continue Checking"
+                    : "Start Checking"}
           </button>
         </div>
 
@@ -414,13 +526,13 @@ When translating, consider the character's personality and background when avail
           </div>
         )}
 
-        {translatedData.length > 0 && (
+        {(translatedData.length > 0 || checkedData.length > 0) && (
           <div className="mb-8 flex justify-center">
             <button
-              onClick={downloadTranslatedCSV}
+              onClick={operationMode === "translate" ? downloadTranslatedCSV : downloadCheckedCSV}
               className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
             >
-              Download Translated CSV
+              Download {operationMode === "translate" ? "Translated" : "Checked"} CSV
             </button>
           </div>
         )}
@@ -436,32 +548,43 @@ When translating, consider the character's personality and background when avail
                       {column}
                     </th>
                   ))}
+                  {operationMode === "check" && checkedData.length > 0 && (
+                    <th className="border px-4 py-2">Mistakes</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
-                {(translatedData.length > 0 ? translatedData : csvData)
-                  //.slice(0, 5)
-                  .map((row, rowIndex) => (
-                    <tr key={rowIndex}>
-                      {columns.map((column, colIndex) => (
-                        <td key={colIndex} className="border px-4 py-2">
-                          {row[column]}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
+                {(operationMode === "translate"
+                  ? translatedData.length > 0
+                    ? translatedData
+                    : csvData
+                  : csvData
+                ).map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {columns.map((column, colIndex) => (
+                      <td key={colIndex} className="border px-4 py-2">
+                        {row[column]}
+                      </td>
+                    ))}
+                    {operationMode === "check" && checkedData.length > 0 && (
+                      <td className="border px-4 py-2">
+                        {columns
+                          .map((col) => (checkedData[rowIndex]?.[col] ? "★" : ""))
+                          .filter(Boolean)
+                          .join(" ")}
+                      </td>
+                    )}
+                  </tr>
+                ))}
               </tbody>
             </table>
             {csvData.length > 0 && (
               <p className="text-center mt-2">{csvData.length} total rows</p>
             )}
-            {/* {csvData.length > 5 && (
-              <p className="text-center mt-2">
-                Showing first 5 rows of {csvData.length} total rows
-              </p>
-            )} */}
           </div>
         )}
+
+
       </div>
     </main>
   );
