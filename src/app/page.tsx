@@ -381,13 +381,17 @@ When translating, consider the character's personality and background when avail
               className="border p-2 rounded w-48"
               disabled={isTranslating}
             >
-              <option value="chatgpt-4o-latest">
-                ChatGPT-4o Latest (Most Capable & Most Expensive)
+              <option value="gpt-4.1-2025-04-14">
+                GPT-4.1 Flagship GPT model for complex tasks
               </option>
-              <option value="gpt-4o">GPT-4o (Baseline)</option>
+              <option value="chatgpt-4o-latest">
+                ChatGPT-4o - Model used in ChatGPT (Most Capable & Most Expensive)
+              </option>
+              <option value="gpt-4o-2024-11-20">GPT-4o (Baseline)</option>
               <option value="gpt-4o-mini-2024-07-18">
                 GPT-4o-mini (Fast and affordable)
               </option>
+
             </select>
           </div>
           <div>
@@ -412,18 +416,35 @@ When translating, consider the character's personality and background when avail
         </div>
 
         <div className="mb-8 flex justify-center">
-          <button
-            onClick={translateCSV}
-            className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ${isTranslating ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            disabled={isTranslating || csvData.length === 0}
-          >
-            {isTranslating
-              ? "Translating..."
-              : translatedData.length > 0
-                ? "Continue Translation"
-                : "Start Translation"}
-          </button>
+          {
+            operationMode === 'translate' ?
+
+              <button
+                onClick={translateCSV}
+                className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ${isTranslating ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                disabled={isTranslating || csvData.length === 0}
+              >
+                {isTranslating
+                  ? "Translating..."
+                  : translatedData.length > 0
+                    ? "Continue Translation"
+                    : "Start Translation"}
+              </button> :
+
+              <button
+                onClick={translateCSV}
+                className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ${isTranslating ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                disabled={isTranslating || csvData.length === 0}
+              >
+                {isTranslating
+                  ? "Checking..."
+                  : translatedData.length > 0
+                    ? "Continue Spelling and Grammar Check"
+                    : "Start Spelling and Grammar Check"}
+              </button>
+          }
         </div>
 
         {error && <div className="mb-8 text-red-500 text-center">{error}</div>}
