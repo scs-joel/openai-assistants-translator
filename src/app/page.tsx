@@ -237,14 +237,16 @@ When translating, consider the character's personality and background when avail
       return;
     }
 
-    // Add stars to cells with mistakes
-    const processedData = csvData.map((row, rowIndex) => {
+    // Use translated data if available, otherwise use original data
+    const sourceData = translatedData.length > 0 ? translatedData : csvData;
+
+    // Add stars to cells with mistakes (only for the last column)
+    const processedData = sourceData.map((row, rowIndex) => {
       const newRow = { ...row };
-      columns.forEach((column) => {
-        if (checkedData[rowIndex]?.[column]) {
-          newRow[`${column}_Mistakes`] = "★";
-        }
-      });
+      const lastColumn = columns[columns.length - 1];
+      if (checkedData[rowIndex]?.[lastColumn]) {
+        newRow[`${lastColumn}_Mistakes`] = "★";
+      }
       return newRow;
     });
 
@@ -258,6 +260,14 @@ When translating, consider the character's personality and background when avail
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleOperationModeChange = (mode: "translate" | "check") => {
+    setOperationMode(mode);
+    if (mode === "check") {
+      setProgress(0);
+      setCheckedData([]);
+    }
   };
 
   return (
@@ -292,7 +302,7 @@ When translating, consider the character's personality and background when avail
               <input
                 type="radio"
                 checked={operationMode === "translate"}
-                onChange={() => setOperationMode("translate")}
+                onChange={() => handleOperationModeChange("translate")}
                 className="h-4 w-4"
               />
               Translate
@@ -301,7 +311,7 @@ When translating, consider the character's personality and background when avail
               <input
                 type="radio"
                 checked={operationMode === "check"}
-                onChange={() => setOperationMode("check")}
+                onChange={() => handleOperationModeChange("check")}
                 className="h-4 w-4"
               />
               Check
@@ -558,7 +568,11 @@ When translating, consider the character's personality and background when avail
                   ? translatedData.length > 0
                     ? translatedData
                     : csvData
-                  : csvData
+                  : operationMode === "check"
+                    ? translatedData.length > 0
+                      ? translatedData
+                      : csvData
+                    : csvData
                 ).map((row, rowIndex) => (
                   <tr key={rowIndex}>
                     {columns.map((column, colIndex) => (
@@ -568,10 +582,7 @@ When translating, consider the character's personality and background when avail
                     ))}
                     {operationMode === "check" && checkedData.length > 0 && (
                       <td className="border px-4 py-2">
-                        {columns
-                          .map((col) => (checkedData[rowIndex]?.[col] ? "★" : ""))
-                          .filter(Boolean)
-                          .join(" ")}
+                        {checkedData[rowIndex]?.[columns[columns.length - 1]] ? "★" : ""}
                       </td>
                     )}
                   </tr>

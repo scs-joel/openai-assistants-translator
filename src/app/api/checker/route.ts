@@ -10,13 +10,12 @@ function generateCheckerSchema(keys) {
     };
   }
 
-  const properties = {};
-  const required = [];
-
-  keys.forEach((key) => {
-    properties[key] = { type: "boolean" };
-    required.push(key);
-  });
+  // Only check the last column
+  const lastColumn = keys[keys.length - 1];
+  const properties = {
+    [lastColumn]: { type: "boolean" }
+  };
+  const required = [lastColumn];
 
   return {
     type: "object",
