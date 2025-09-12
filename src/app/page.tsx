@@ -451,15 +451,17 @@ When translating, consider the character's personality and background when avail
               className="border p-2 rounded w-48"
               disabled={isTranslating || isChecking}
             >
+              <option value="gpt-5-2025-08-07">
+                GPT-5 - Latest Model recommended for api use
+              </option>
+              <option value="gpt-5-mini-2025-08-07">
+                GPT-5-mini (Fast and affordable)
+              </option>
               <option value="gpt-4.1-2025-04-14">
-                GPT-4.1 Flagship GPT model for complex tasks
+                GPT-4.1 - Flagship GPT model for complex tasks
               </option>
               <option value="chatgpt-4o-latest">
                 ChatGPT-4o - Model used in ChatGPT (Most Capable & Most Expensive)
-              </option>
-              <option value="gpt-4o-2024-11-20">GPT-4o (Baseline)</option>
-              <option value="gpt-4o-mini-2024-07-18">
-                GPT-4o-mini (Fast and affordable)
               </option>
 
             </select>
