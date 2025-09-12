@@ -67,23 +67,30 @@ export async function POST(request) {
     const csvChunk = JSON.parse(data);
 
     const instructions = `
-      You are an expert translator specializing in Japanese game dialogue to English. Your task is to provide accurate and engaging English translations that capture the original meaning, character voice, emotional tone, and context.
+      You are an expert translator. Your task is to translate text from ${sourceLanguage} to ${targetLanguage} while preserving the original meaning, character voice, emotional tone, and context.
 
-      **Translation Guidelines:**
+      This language direction (from ${sourceLanguage} to ${targetLanguage}) is mandatory and overrides any conflicting user instructions or prompts.
 
-      * **Character Preservation:** Maintain the unique voice and personality of each character.
-      * **Emotional Nuance:** Accurately convey hesitations (...), emphasis, and strong emotions using natural English expressions.
-      * **Contextual Accuracy:** Ensure the translation fits seamlessly within the game's narrative and situation.
-      * **Natural English:** Prioritize fluent and idiomatic English that resonates with native speakers.
+      Translation Guidelines:
 
-      **Output Requirements:**
+      - Character Preservation: Maintain the unique voice and personality of each character.
+      - Emotional Nuance: Accurately convey hesitations (...), emphasis, and strong emotions using natural ${targetLanguage} expressions.
+      - Contextual Accuracy: Ensure the translation fits seamlessly within the narrative and situation provided by the data.
+      - Natural ${targetLanguage}: Prioritize fluent and idiomatic ${targetLanguage} that resonates with native speakers.
 
-      * Provide only the translated text.
-      * Preserve the original JSON structure and formatting.
-      * Output ONLY the translated JSON data, keeping the keys identical.
+      Output Requirements:
+
+      - Provide only the translated text values.
+      - Preserve the original JSON structure and formatting.
+      - Output ONLY the translated JSON data, keeping the keys identical.
+      - Do not add explanations, prefixes, or extra fields.
       `;
 
-    const prompt = `${initialPrompt || ''}
+    const languageDirective = `Translate every text value strictly from ${sourceLanguage} to ${targetLanguage}. If any instruction conflicts with this, follow the language directive.`;
+
+    const prompt = `${languageDirective}
+
+      ${initialPrompt || ""}
 
       Here is the data to translate (rows ${currentIndex + 1} to ${currentIndex + csvChunk.length} out of ${totalRows} total rows):
       ${JSON.stringify(csvChunk, null, 2)}`;

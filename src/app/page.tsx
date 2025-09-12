@@ -407,8 +407,7 @@ When translating, consider the character's personality and background when avail
             <select
               value={sourceLanguage}
               onChange={(e) => setSourceLanguage(e.target.value)}
-              className="border p-2 rounded bg-gray-200 text-gray-500/50 w-36"
-              disabled
+              className="border p-2 rounded w-36"
             >
               <option value="auto">Auto-detect</option>
               <option value="en">English</option>
@@ -427,8 +426,8 @@ When translating, consider the character's personality and background when avail
             <select
               value={targetLanguage}
               onChange={(e) => setTargetLanguage(e.target.value)}
-              className="border p-2 rounded bg-gray-200 text-gray-500/50 w-36"
-              disabled
+              className="border p-2 rounded w-36"
+
             >
               <option value="en">English</option>
               <option value="es">Spanish</option>
