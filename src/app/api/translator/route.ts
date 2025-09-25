@@ -54,7 +54,7 @@ export async function POST(request) {
       refinementPrompt,
       model,
       temperature,
-      operationMode,
+      operationMode: _operationMode,
     } = await request.json();
 
     // Initialize the OpenAI client
@@ -98,7 +98,8 @@ export async function POST(request) {
     const csvSchema = generateStringArraySchema(columns);
 
     // Create the API request
-    const response = await openai.responses.create({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const requestConfig: any = {
       model: model || "gpt-4o",
       instructions: instructions,
       input: [
@@ -113,7 +114,6 @@ export async function POST(request) {
       ],
       store: true,
       ...(previousResponseId && { previous_response_id: previousResponseId }),
-      temperature: temperature ?? 0.5,
       text: {
         format: {
           type: "json_schema",
@@ -122,7 +122,14 @@ export async function POST(request) {
           strict: true,
         },
       },
-    });
+    };
+
+    // Only add temperature for non-GPT-5 models
+    if (!model?.startsWith("gpt-5")) {
+      requestConfig.temperature = temperature ?? 0.5;
+    }
+
+    const response = await openai.responses.create(requestConfig);
 
     let processedData;
     try {
@@ -131,12 +138,12 @@ export async function POST(request) {
 
       if (refinementPrompt) {
         // Handle translation with refinement
-        const secondResponse = await openai.responses.create({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const refinementConfig: any = {
           model: model || "gpt-4o",
           previous_response_id: response.id,
           input: refinementPrompt,
           store: true,
-          temperature: temperature ?? 0.5,
           text: {
             format: {
               type: "json_schema",
@@ -145,7 +152,14 @@ export async function POST(request) {
               strict: true,
             },
           },
-        });
+        };
+
+        // Only add temperature for non-GPT-5 models
+        if (!model?.startsWith("gpt-5")) {
+          refinementConfig.temperature = temperature ?? 0.5;
+        }
+
+        const secondResponse = await openai.responses.create(refinementConfig);
 
         const secondOutputText = secondResponse.output_text.trim();
         const refinedData = JSON.parse(secondOutputText);

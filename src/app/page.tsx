@@ -477,12 +477,14 @@ When translating, consider the character's personality and background when avail
                 value={temperature}
                 onChange={(e) => setTemperature(parseFloat(e.target.value))}
                 className="w-32"
-                disabled={isTranslating || isChecking}
+                disabled={isTranslating || isChecking || model?.startsWith("gpt-5")}
               />
               <span className="w-12 text-center">{temperature}</span>
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              0 = More precise, 2 = More creative
+              {model?.startsWith("gpt-5")
+                ? "Temperature not supported for GPT-5 models"
+                : "0 = More precise, 2 = More creative"}
             </p>
           </div>
         </div>

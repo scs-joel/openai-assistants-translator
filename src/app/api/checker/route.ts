@@ -41,7 +41,7 @@ export async function POST(request) {
     const {
       data,
       columns,
-      language,
+      language: _language,
       apikey,
       model,
       temperature,
@@ -70,7 +70,8 @@ export async function POST(request) {
     const checkerSchema = generateCheckerSchema(columns);
 
     // Create the API request
-    const response = await openai.responses.create({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const requestConfig: any = {
       model: model || "gpt-4o",
       instructions: instructions,
       input: [
@@ -84,7 +85,6 @@ export async function POST(request) {
         },
       ],
       store: true,
-      temperature: temperature ?? 0.5,
       text: {
         format: {
           type: "json_schema",
@@ -93,7 +93,14 @@ export async function POST(request) {
           strict: true,
         },
       },
-    });
+    };
+
+    // Only add temperature for non-GPT-5 models
+    if (!model?.startsWith("gpt-5")) {
+      requestConfig.temperature = temperature ?? 0.5;
+    }
+
+    const response = await openai.responses.create(requestConfig);
 
     let processedData;
     try {
